@@ -65,6 +65,7 @@ public class LazyProp {
 
                 }
             }
+            
              
 
             out.flush();
@@ -98,7 +99,7 @@ public class LazyProp {
             build(2*idx+2, mid+1,j,nums);
             arr[idx]= operation(arr[2*idx+1],arr[2*idx+2]);
         }
-        public void update(int idx, int i, int j, int l, int r, int val){
+        public void update(int idx, int i, int j, int l, int r, long val){
             // update the previous and prop downwards 
             if(lazy[idx]!=0){
                 arr[idx]+=lazy[idx]*(j-i+1);
@@ -160,9 +161,12 @@ public class LazyProp {
             return x;
 
         }
+        
     }
+    
+    
     static long operation(long a, long b){
-        return a+b; 
+        return a; 
     }
     static void solve(int n,long[] nums,int k){
         

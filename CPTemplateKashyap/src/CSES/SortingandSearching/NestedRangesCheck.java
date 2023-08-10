@@ -5,7 +5,7 @@ package CSES.SortingandSearching;
 import java.io.*;
 import java.util.*;
  
-class Towers {
+class NestedRangesCheck {
 
     static PrintWriter out;
     static Utility util;
@@ -39,41 +39,48 @@ class Towers {
             Reader sc = new Reader();
             util = new Utility();
             out = new PrintWriter(System.out);
+            
             int n = sc.nextInt();
-            long [] nums = new long[n];
-            long max=0;
-            long ans=0;
-            
+            Pair[] nums = new Pair[n];
             for(int i=0;i<n;i++){
-                nums[i]=sc.nextLong();
+                long a= sc.nextLong();
+                long b= sc.nextLong();
+                nums[i]= new Pair(a,b,i);
             }
-            
-            
-            int start=0;
-            List<Long> arr = new ArrayList<>();
+            Arrays.sort(nums, (a,b)-> a.l==b.l? 
+            Long.compare(b.r,a.r): Long.compare(a.l,b.l));
+            long maxEnd= 0;
+            int[] contained= new int[n];
+            int[] contains= new int[n];
             for(int i=0;i<n;i++){
-               int s=0,e=arr.size()-1;
-               int a1=e+1;
-               while(s<=e){
-                int m =s+(e-s)/2;
-                if(nums[i]<arr.get(m)){
-                    a1=m;
-                    e=m-1;
+                if(nums[i].r<=maxEnd){
+                    contained[nums[i].idx]=1;
                 }else{
-                    s=m+1;
+                    maxEnd= nums[i].r;
                 }
-               }
-               if(a1==arr.size()){
-                arr.add(nums[i]);
-               }else{
-                arr.set(a1,nums[i]);
-               }
-            
-                
             }
+            long min =(int)(1e9+1);
+            for(int i=n-1;i>=0;i--){
+                if(min<=nums[i].r){
+                    contains[nums[i].idx]=1;
+                }else{
+                    min= nums[i].r;
+                }
+            }
+            for(int i=0;i<n;i++){
+                out.print(contains[i] +" ");
+            }
+            out.println("");
+            for(int i=0;i<n;i++){
+                out.print(contained[i] +" ");
+            }
+
+            
+
+            
            
             
-            out.println(arr.size());
+            
         
             out.flush();
         
@@ -85,6 +92,15 @@ class Towers {
             out.flush();
             System.out.println(e);
             return;
+        }
+    }
+    static class Pair{
+        long l,r;
+        int idx;
+        public Pair(long l, long r, int idx){
+                this.l=l;
+                this.r=r;
+                this.idx= idx;
         }
     }
     static boolean bs(long m, long[] arr){
@@ -401,6 +417,51 @@ class Towers {
         }
  
     }
+    static class SGT{
+        //update, query, build 
+        int[] seg;
+        public SGT(int n){
+            seg= new int[4*n];
+        }
+        public void build(int i, int low, int high, int[] arr){
+            if(low==high){
+                seg[i]=arr[low];
+                return;
+            }
+            int mid = low+(high-low)/2;
+            build(2*i+1,low,mid,arr);
+            build(2*i+2,mid+1,high,arr);
+            seg[i]=seg[2*i+1]+seg[2*i+2];
+            
+        }
+        public void update(int i, int low, int high, int idx,int val ){// for point updates 
+            if(low==high){
+                seg[i]=val;
+                return;
+            }
+            int m = low+(high-low)/2;
+            if(idx<=m){
+                update(2*i+1,low,m,idx,val);
+            }else{
+                update(2*i+2,m+1,high,idx,val);
+            }
+            seg[i]=seg[2*i+1]+seg[2*i+2];
+            return;
+    
+        }
+        public int query(int i, int l, int r, int low, int high){
+            if(r<low || l>high ) return 0;
+            
+            if(l<=low && r>=high){
+                return seg[i];
+            }
+            int m = (low)+(high-low)/2;
+            int a= query(2*i+1,l,r,low,m);
+            int b= query(2*i+2,l,r,m+1,high);
+            return a+b;
+        }
+    }
+
     static class Reader {
         final private int BUFFER_SIZE = 1 << 16;
         private DataInputStream din;

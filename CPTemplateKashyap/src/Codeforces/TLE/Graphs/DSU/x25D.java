@@ -1,11 +1,10 @@
-package CSES.SortingandSearching;
-
+package Codeforces.TLE.Graphs.DSU; 
 
 
 import java.io.*;
 import java.util.*;
  
-class Towers {
+class x25D {
 
     static PrintWriter out;
     static Utility util;
@@ -13,7 +12,9 @@ class Towers {
     static boolean ONLINE_JUDGE = false;
     static int itr;
     static int md = 32768;
+    static int mod = (int)(1e9+7);
 	static HashMap<Integer, List<GraphEdge>> graph;
+    
     
     static int[] dr = {-1,0,1,0}, dc= {0,1,0,-1};
     
@@ -23,11 +24,11 @@ class Towers {
         try {
             // System.out.println(System.getProperty("ONLINE_JUDGE"));
             if (System.getProperty("ONLINE_JUDGE") == null && !ONLINE_JUDGE) {
-                FileOutputStream output = new FileOutputStream("CompetitiveProgramming/CPTemplateKashyap/src/CSES/SortingandSearching/output.txt");
+                FileOutputStream output = new FileOutputStream("/Users/kashyapchaganti/Documents/Code/CompetitiveProgramming/CPTemplateKashyap/src/output.txt");
                 PrintStream out = new PrintStream(output);
                 System.setOut(out);
  
-                InputStream input = new FileInputStream("CompetitiveProgramming/CPTemplateKashyap/src/CSES/SortingandSearching/input.txt");
+                InputStream input = new FileInputStream("/Users/kashyapchaganti/Documents/Code/CompetitiveProgramming/CPTemplateKashyap/src/input.txt");
                 System.setIn(input);
             }
  
@@ -40,41 +41,19 @@ class Towers {
             util = new Utility();
             out = new PrintWriter(System.out);
             int n = sc.nextInt();
-            long [] nums = new long[n];
-            long max=0;
-            long ans=0;
-            
+            n--;
+            long[][] nums = new long[n][2];
             for(int i=0;i<n;i++){
-                nums[i]=sc.nextLong();
+                nums[i][0]=sc.nextLong();
+                nums[i][1]=sc.nextLong();
             }
-            
-            
-            int start=0;
-            List<Long> arr = new ArrayList<>();
-            for(int i=0;i<n;i++){
-               int s=0,e=arr.size()-1;
-               int a1=e+1;
-               while(s<=e){
-                int m =s+(e-s)/2;
-                if(nums[i]<arr.get(m)){
-                    a1=m;
-                    e=m-1;
-                }else{
-                    s=m+1;
-                }
-               }
-               if(a1==arr.size()){
-                arr.add(nums[i]);
-               }else{
-                arr.set(a1,nums[i]);
-               }
-            
-                
-            }
+
+    //         for(long[] x: nums){
+    //        out.println(Arrays.toString(x));
+    //    }
+            solve(n,nums);
            
             
-            out.println(arr.size());
-        
             out.flush();
         
         }
@@ -87,25 +66,149 @@ class Towers {
             return;
         }
     }
-    static boolean bs(long m, long[] arr){
-        int start =0; long s=0;
-        for(int i=0;i<arr.length;i++){
-            s+=arr[i];
-            if(s==m) return false;
-            while(s>m && start<i){
-                s-=arr[start];
-                if(s==m){
-                    return false;
+    static void solve(int n , long[][] nums){
+       List<List<Long>> adj = new  ArrayList<>();
+    //    for(int i=0;i<=n;i++){
+    //         adj.add(new ArrayList<>());
+    //    }
+       
+       long c=0;
+       DSU du = new DSU(n+1);
+       HashMap<Integer, List<Integer>> parents = new HashMap<>();
+       List<List<Integer>> e= new ArrayList<>();
+       for(int i=0;i<n;i++){
+        int x = (int)nums[i][0];
+        int y =(int)nums[i][1];
+        if(du.find(x)!=du.find(y)){
+            du.union(x,y);
+        }else{
+            c++;
+            int  a =du.find(x);
+            int  b =du.find(y);
+            
+            e.add(new ArrayList<>(Arrays.asList(x,y)));
+        }
+
+       }
+       
+       
+       for(int i=1;i<=n+1;i++){
+            if(du.find(i)!=i){
+                int p=du.find(i);
+                if(parents.containsKey(p)){
+                    parents.get(p).add(i);
+                }else{
+                    parents.put(p, new ArrayList<>());
+                    
+                    parents.get(p).add(i);
                 }
-                start++;
             }
-            if(start==i && arr[i]>m){
-                return true;
+            else{
+                int p=du.find(i);
+                if(parents.containsKey(p)){
+                    parents.get(p).add(i);
+                }else{
+                    parents.put(p, new ArrayList<>());
+                    
+                    parents.get(p).add(i);
+                }
+            }
+       }
+    //    out.println(parents +" "+e);
+          List<Integer> p1 = new ArrayList<>();
+          for(Map.Entry<Integer,List<Integer>>e1: parents.entrySet()){
+                p1.add(e1.getKey());
+          }
+          if(p1.size()==1){
+            out.println(0);
+            return;
+          }else{
+            out.println(c);
+          }
+        //   out.println(p1);
+          for(int i=0;i<p1.size()-1;i++){
+            int x =p1.get(i),y= p1.get(i+1);
+            
+                if(c>0){
+                    List<Integer> c1 = e.get(0);
+                e.remove(0);
+                out.println(c1.get(0) +" "+c1.get(1) +" "+x+" "+y );
+                          }
+
+            
+            c--;
+                        }
+            
+
+
+    }
+    static long check(long[][] dp, int i, int j,long[] nums,long[] ps){
+       if(i==j){
+            return nums[i];
+       }
+       if(i>j){
+        return 0;
+       }
+       if(dp[i][j]!=-1){
+            return dp[i][j];
+       }
+       long a = nums[i]+ps[j]-ps[i]-check(dp,i+1,j,nums,ps);
+       
+       if(j-1>=0 && i-1>=0){
+        long b = nums[j] + ps[j-1]-ps[i-1]-check(dp,i,j-1,nums,ps);
+        a= Math.max(a,b);
+       }else{
+        if(i==0){
+            long b = nums[j] + ps[j-1]- check(dp,i,j-1,nums,ps);
+        a= Math.max(a,b);
+        }
+        
+       }
+       return dp[i][j]= a;
+       
+    }
+
+    
+    
+    static class DSU{
+        int n;
+        List<Integer> p,s;
+        public DSU(int n){
+            this.n=n ;
+            p=new ArrayList<>();
+            s=new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                p.add(i);
+                s.add(1);
             }
         }
-        return true;
+        public int find(int node){
+            if(node==p.get(node)){
+                return node;
+            }
+            int ulp = find(p.get(node));
+            p.set(node,ulp);
+            return ulp;
+        }
+        public void union(int n1, int n2){
+            int ulp1= find(n1);
+            int ulp2= find(n2);
+            if(ulp1==ulp2){
+                return; 
+            }
+
+            if(s.get(ulp1)>=s.get(ulp2)){
+                s.set(ulp1,s.get(ulp1)+s.get(ulp2));
+                p.set(ulp2, ulp1);
+            }else{
+                s.set(ulp2,s.get(ulp1)+s.get(ulp2));
+                p.set(ulp1, ulp2);
+            }
+        }
+
     }
     
+  
 
     static class GraphEdge{
         public int destination;

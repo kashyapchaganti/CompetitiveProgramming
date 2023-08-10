@@ -23,11 +23,11 @@ class TrafficLights {
         try {
             // System.out.println(System.getProperty("ONLINE_JUDGE"));
             if (System.getProperty("ONLINE_JUDGE") == null && !ONLINE_JUDGE) {
-                FileOutputStream output = new FileOutputStream("src/CSES/SortingandSearching/output.txt");
+                FileOutputStream output = new FileOutputStream("CompetitiveProgramming/CPTemplateKashyap/src/CSES/SortingandSearching/output.txt");
                 PrintStream out = new PrintStream(output);
                 System.setOut(out);
  
-                InputStream input = new FileInputStream("src/CSES/SortingandSearching/input.txt");
+                InputStream input = new FileInputStream("CompetitiveProgramming/CPTemplateKashyap/src/CSES/SortingandSearching/input.txt");
                 System.setIn(input);
             }
  
