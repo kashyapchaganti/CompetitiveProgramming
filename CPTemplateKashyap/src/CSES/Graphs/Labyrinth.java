@@ -1,8 +1,8 @@
-package CSES.SortingandSearching;
+package CSES.Graphs;
 import java.io.*;
 import java.util.*;
  
-class MaxSubArraySumII {
+class Labyrinth {
 
     static PrintWriter out;
     static Utility util;
@@ -37,13 +37,28 @@ class MaxSubArraySumII {
             util = new Utility();
             out = new PrintWriter(System.out);
             int n = sc.nextInt();
-            int l=sc.nextInt();
-            int r= sc.nextInt();
-            List<Long> arr = new ArrayList<>();
+            int m = sc.nextInt();
+            char[][] grid = new char[n][m];
+            String[] g =new String[n];
             for(int i=0;i<n;i++){
-                arr.add(sc.nextLong());
+                g[i] =sc.readLine();
             }
-            out.println(check(arr,l,r));
+            int i1=0, j1=0,i2=0,j2=0;
+            for(int i=0;i<n;i++){
+                String w= g[i];
+                for(int j=0;j<m;j++){
+                    grid[i][j]= w.charAt(j);
+                    if(grid[i][j]=='A'){
+                        i1=i;
+                        j1=j; 
+                    }else if(grid[i][j]=='B'){
+                        i2=i;
+                        j2=j;
+                    }
+                }
+            }
+            // out.println(i1 +" "+j1 +" "+ i2 +" "+j2);
+            check(grid,n,m, i1,j1, i2, j2);
         
             
         
@@ -59,15 +74,56 @@ class MaxSubArraySumII {
             return;
         }
     }
+    static void  check(char[][] grid, int n, int m ,int i1, int j1, int i2, int j2 ){
+        int[][]vis = new int[n][m];
+        Queue<Pair> q = new LinkedList<>();
+        q.add(new Pair(i1,j1));
+        int[][]prev = new int[n][m];
+        // for(int[] p: prev)Arrays.fill(p,-1);
+        String dir = "URDL";
+        vis[i1][j1]=1;
+        while(!q.isEmpty()){
+            Pair cur = q.poll();
+            for(int k=0;k<4;k++){
+                int x= cur.r+dr[k];
+                int y= cur.c+dc[k];
+                if(x>=0 && y>=0 && x<n && y<m && grid[x][y]!='#' && vis[x][y]==0){
+                    vis[x][y]=1;
+                    q.add(new Pair(x,y));
+                    prev[x][y]=k;
+                }
+            }
+        }
+        Pair beg= new Pair(i1,j1);
+        Pair end= new Pair(i2,j2);
+        if(vis[i2][j2]==1){
+            System.out.println("YES");
+            StringBuilder sb = new StringBuilder();
+            while(true){
+                if(end.r==i1 && end.c==j1) break;
+                int p = prev[end.r][end.c];
+                sb.append(dir.charAt(p));
+                
+                end= new Pair(end.r-dr[p],end.c-dc[p]);
+            }
+            // Collections.reverse(steps);
+            System.out.println(sb.length());
+            System.out.println(sb.reverse().toString());
+            System.out.println();
+        }else{
+             out.println("NO");
+        }
+         
+    }
+   
     static class Pair{
-        long v;
-        int idx;
-        public Pair(long v, int idx){
-            this.v=v;
-            this.idx=idx;
+        int r,c;
+        public Pair(int  r, int c){
+            this.r=r;
+            this.c=c;
         }
         public String toString(){
-            return v+" "+idx;
+            return r+" "+c;
         }
     }
     static long check(List<Long> arr, int L, int R){
@@ -549,3 +605,4 @@ class MaxSubArraySumII {
         }
     }
 }
+

@@ -1,8 +1,8 @@
-package CSES.SortingandSearching;
+package CSES.Graphs;
 import java.io.*;
 import java.util.*;
  
-class MaxSubArraySumII {
+class BuildingTeams {
 
     static PrintWriter out;
     static Utility util;
@@ -37,13 +37,31 @@ class MaxSubArraySumII {
             util = new Utility();
             out = new PrintWriter(System.out);
             int n = sc.nextInt();
-            int l=sc.nextInt();
-            int r= sc.nextInt();
-            List<Long> arr = new ArrayList<>();
-            for(int i=0;i<n;i++){
-                arr.add(sc.nextLong());
+            int m = sc.nextInt();
+            List<List<Integer>> adj = new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                adj.add(new ArrayList<>());
             }
-            out.println(check(arr,l,r));
+            for(int i=0;i<m;i++){
+                int a =sc.nextInt();
+                int b =sc.nextInt();
+                adj.get(a).add(b);
+                adj.get(b).add(a);
+            }
+            int[] vis = new int[n+1];
+           for(int i=1;i<=n;i++){
+                if(vis[i]==0){
+                    vis[i]=1;
+                    if(!check(i,vis,adj)){
+                        
+                        out.println("IMPOSSIBLE");
+                    }
+                }
+           }
+           for(int i=1;i<=n;i++){
+            out.print(vis[i]+" ");
+           }
+            // check(grid,n,m, i1,j1, i2, j2);
         
             
         
@@ -59,15 +77,70 @@ class MaxSubArraySumII {
             return;
         }
     }
+    static boolean  check(int i, int [] vis, List<List<Integer>> adj){
+        for(int x: adj.get(i)){
+            if(vis[x]==0){
+                
+                if(vis[i]==2){
+                    vis[x]=1;
+                    
+                }else{
+                    vis[x]=2;
+                }
+                if(!check(x,vis,adj)){
+                        return false;
+                    }
+            }else{
+                if(vis[i]==1 && vis[x]==1)return false;
+                if(vis[i]==2 && vis[x]==2)return false;
+            }
+        }
+        return true;
+       
+         
+    }
+    static class DSU{
+        List<Integer> p,size ;
+        public DSU(int n){
+            p =new ArrayList<>();
+            size=new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                p.add(i);
+                size.add(1);
+            }
+        }
+        public int find(int n){
+            if(p.get(n)==n){
+                return n;
+            }
+            int v= find(p.get(n));
+            p.set(n,v);
+            return v;
+        }
+        public void union(int a, int b){
+            int p1 = find(a);
+            int p2 = find(b);
+            if(p1==p2){
+                return;
+            }
+            if(size.get(p1)>size.get(p2)){
+                p.set(p2, p1);
+                size.set(p1, size.get(p1)+size.get(p2));
+            }else{
+                p.set(p1, p2);
+                size.set(p2, size.get(p1)+size.get(p2));
+            }
+        }
+    }
+   
     static class Pair{
-        long v;
-        int idx;
-        public Pair(long v, int idx){
-            this.v=v;
-            this.idx=idx;
+        int r,c;
+        public Pair(int  r, int c){
+            this.r=r;
+            this.c=c;
         }
         public String toString(){
-            return v+" "+idx;
+            return r+" "+c;
         }
     }
     static long check(List<Long> arr, int L, int R){
@@ -549,3 +622,4 @@ class MaxSubArraySumII {
         }
     }
 }
+

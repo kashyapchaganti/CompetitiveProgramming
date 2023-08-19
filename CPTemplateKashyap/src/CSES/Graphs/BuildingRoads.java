@@ -1,8 +1,8 @@
-package CSES.SortingandSearching;
+package CSES.Graphs;
 import java.io.*;
 import java.util.*;
  
-class MaxSubArraySumII {
+class BuildingRoads {
 
     static PrintWriter out;
     static Utility util;
@@ -37,13 +37,38 @@ class MaxSubArraySumII {
             util = new Utility();
             out = new PrintWriter(System.out);
             int n = sc.nextInt();
-            int l=sc.nextInt();
-            int r= sc.nextInt();
-            List<Long> arr = new ArrayList<>();
+            int m = sc.nextInt();
+            List<List<Integer>> adj = new ArrayList<>();
             for(int i=0;i<n;i++){
-                arr.add(sc.nextLong());
+                adj.add(new ArrayList<>());
             }
-            out.println(check(arr,l,r));
+            DSU ds = new DSU(n);
+            for(int i=0;i<m;i++){
+                int a = sc.nextInt();
+                int b = sc.nextInt();
+                ds.union(a,b);
+            }
+            int c=0;
+            int p = ds.find(1);
+            
+            for(int i=1;i<=n;i++){
+                if(ds.p.get(i)==i){
+                    c++;
+                }
+            }
+            out.println(c-1);
+            
+            for(int i=2;i<=n;i++){
+                int v= ds.find(i);
+                if(p!=v){
+                    ds.union(p,v);
+                     
+                    out.println(p+" "+v );
+                    p=ds.find(p);  
+                }
+            }
+            
+            // check(grid,n,m, i1,j1, i2, j2);
         
             
         
@@ -59,15 +84,52 @@ class MaxSubArraySumII {
             return;
         }
     }
+    static void  check(){
+       
+         
+    }
+    static class DSU{
+        List<Integer> p,size ;
+        public DSU(int n){
+            p =new ArrayList<>();
+            size=new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                p.add(i);
+                size.add(1);
+            }
+        }
+        public int find(int n){
+            if(p.get(n)==n){
+                return n;
+            }
+            int v= find(p.get(n));
+            p.set(n,v);
+            return v;
+        }
+        public void union(int a, int b){
+            int p1 = find(a);
+            int p2 = find(b);
+            if(p1==p2){
+                return;
+            }
+            if(size.get(p1)>size.get(p2)){
+                p.set(p2, p1);
+                size.set(p1, size.get(p1)+size.get(p2));
+            }else{
+                p.set(p1, p2);
+                size.set(p2, size.get(p1)+size.get(p2));
+            }
+        }
+    }
+   
     static class Pair{
-        long v;
-        int idx;
-        public Pair(long v, int idx){
-            this.v=v;
-            this.idx=idx;
+        int r,c;
+        public Pair(int  r, int c){
+            this.r=r;
+            this.c=c;
         }
         public String toString(){
-            return v+" "+idx;
+            return r+" "+c;
         }
     }
     static long check(List<Long> arr, int L, int R){
@@ -549,3 +611,4 @@ class MaxSubArraySumII {
         }
     }
 }
+

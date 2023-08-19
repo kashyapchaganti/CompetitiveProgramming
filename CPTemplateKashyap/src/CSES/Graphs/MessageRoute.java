@@ -1,8 +1,8 @@
-package CSES.SortingandSearching;
+package CSES.Graphs;
 import java.io.*;
 import java.util.*;
  
-class MaxSubArraySumII {
+class MessageRoute {
 
     static PrintWriter out;
     static Utility util;
@@ -37,13 +37,50 @@ class MaxSubArraySumII {
             util = new Utility();
             out = new PrintWriter(System.out);
             int n = sc.nextInt();
-            int l=sc.nextInt();
-            int r= sc.nextInt();
-            List<Long> arr = new ArrayList<>();
-            for(int i=0;i<n;i++){
-                arr.add(sc.nextLong());
+            int m = sc.nextInt();
+            List<List<Pair>> adj = new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                adj.add(new ArrayList<>());
             }
-            out.println(check(arr,l,r));
+            for(int i=0;i<m;i++){
+                int a =sc.nextInt();
+                int b =sc.nextInt();
+                adj.get(a).add(new Pair(b,1));
+                adj.get(b).add(new Pair(a,1));
+            }
+            PriorityQueue<Pair> q = new PriorityQueue<>((a,b)-> a.c-b.c);
+            q.add(new Pair(1,0));
+            int[] dis = new int[n+1];
+            int[] path = new int[n+1];
+            Arrays.fill(dis, (int)(1e9));
+            dis[1]=0;
+            while(!q.isEmpty()){
+                Pair cur = q.poll();
+                for(Pair x: adj.get(cur.r)){
+                    if(dis[x.r]>cur.c+1){
+                        dis[x.r]=cur.c+1;
+                        q.add(new Pair(x.r, dis[x.r]));
+                        path[x.r]=cur.r;
+                    }
+                }
+            }
+            if(dis[n]==(int)(1e9)){
+                out.println("IMPOSSIBLE");
+            }else{
+                int count =0;
+            List<Integer> p = new ArrayList<>();
+            while(n!=0){
+                count++;
+                p.add(0,n);
+                n=path[n];
+
+            }
+            out.println(count);
+            for(int i=0;i<=p.size()-1;i++){
+                out.print(p.get(i)+" ");
+            }
+            }
+            // check(grid,n,m, i1,j1, i2, j2);
         
             
         
@@ -59,15 +96,52 @@ class MaxSubArraySumII {
             return;
         }
     }
+    static void  check(){
+       
+         
+    }
+    static class DSU{
+        List<Integer> p,size ;
+        public DSU(int n){
+            p =new ArrayList<>();
+            size=new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                p.add(i);
+                size.add(1);
+            }
+        }
+        public int find(int n){
+            if(p.get(n)==n){
+                return n;
+            }
+            int v= find(p.get(n));
+            p.set(n,v);
+            return v;
+        }
+        public void union(int a, int b){
+            int p1 = find(a);
+            int p2 = find(b);
+            if(p1==p2){
+                return;
+            }
+            if(size.get(p1)>size.get(p2)){
+                p.set(p2, p1);
+                size.set(p1, size.get(p1)+size.get(p2));
+            }else{
+                p.set(p1, p2);
+                size.set(p2, size.get(p1)+size.get(p2));
+            }
+        }
+    }
+   
     static class Pair{
-        long v;
-        int idx;
-        public Pair(long v, int idx){
-            this.v=v;
-            this.idx=idx;
+        int r,c;
+        public Pair(int  r, int c){
+            this.r=r;
+            this.c=c;
         }
         public String toString(){
-            return v+" "+idx;
+            return r+" "+c;
         }
     }
     static long check(List<Long> arr, int L, int R){
@@ -549,3 +623,4 @@ class MaxSubArraySumII {
         }
     }
 }
+

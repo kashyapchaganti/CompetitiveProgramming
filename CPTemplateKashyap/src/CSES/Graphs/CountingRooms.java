@@ -1,8 +1,8 @@
-package CSES.SortingandSearching;
+package CSES.Graphs;
 import java.io.*;
 import java.util.*;
  
-class MaxSubArraySumII {
+class CountingRooms {
 
     static PrintWriter out;
     static Utility util;
@@ -37,13 +37,20 @@ class MaxSubArraySumII {
             util = new Utility();
             out = new PrintWriter(System.out);
             int n = sc.nextInt();
-            int l=sc.nextInt();
-            int r= sc.nextInt();
-            List<Long> arr = new ArrayList<>();
+            int m = sc.nextInt();
+            char[][] grid = new char[n][m];
+            String[] g =new String[n];
             for(int i=0;i<n;i++){
-                arr.add(sc.nextLong());
+                g[i] =sc.readLine();
             }
-            out.println(check(arr,l,r));
+            for(int i=0;i<n;i++){
+                String w= g[i];
+                for(int j=0;j<m;j++){
+                    grid[i][j]= w.charAt(j);
+                }
+            }
+            
+            out.println(check(grid,n,m));
         
             
         
@@ -57,6 +64,29 @@ class MaxSubArraySumII {
             out.flush();
             System.out.println(e);
             return;
+        }
+    }
+    static long check(char[][] grid, int n, int m ){
+        int[][]vis = new int[n][m];
+        long c=0;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(grid[i][j]=='.' && vis[i][j]==0){
+                    check2(grid, i, j, n,m,vis);
+                    c++;
+                }
+            }
+        }
+        return c;
+    }
+    static void check2(char[][] grid, int i, int j, int n ,int m ,int[][] vis ){
+        vis[i][j]=1;
+        for(int k=0;k<4;k++){
+            int x= i+dr[k];
+            int y= j+dc[k];
+            if(x>=0 && y>=0 && x<n && y<m && vis[x][y]==0 && grid[x][y]=='.'){
+                check2(grid, x,y,n,m, vis);
+            }
         }
     }
     static class Pair{

@@ -1,8 +1,8 @@
-package CSES.SortingandSearching;
+package CSES.Graphs;
 import java.io.*;
 import java.util.*;
  
-class MaxSubArraySumII {
+class RoundTrip {
 
     static PrintWriter out;
     static Utility util;
@@ -15,6 +15,7 @@ class MaxSubArraySumII {
     static int[] dr = {-1,0,1,0}, dc= {0,1,0,-1};
     
     static TreeSet<String> res;
+    static int f1;
     public static void main(String[] args) {
         // Comment this code while running in Online Judge
         try {
@@ -37,13 +38,50 @@ class MaxSubArraySumII {
             util = new Utility();
             out = new PrintWriter(System.out);
             int n = sc.nextInt();
-            int l=sc.nextInt();
-            int r= sc.nextInt();
-            List<Long> arr = new ArrayList<>();
-            for(int i=0;i<n;i++){
-                arr.add(sc.nextLong());
+            int m = sc.nextInt();
+            List<List<Integer>> adj = new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                adj.add(new ArrayList<>());
             }
-            out.println(check(arr,l,r));
+            for(int i=0;i<m;i++){
+                int a =sc.nextInt();
+                int b =sc.nextInt();
+                adj.get(a).add(b);
+                adj.get(b).add(a);
+            }
+            int[] vis = new int[n+1];
+            boolean f=false;
+            f1=0;
+            List<Integer> arr =new ArrayList<>();
+           for(int i=1;i<=n;i++){
+                if(vis[i]==0){
+                    vis[i]=1;
+                    
+                    if(check(i,-1, vis,adj)){
+                        f=true;
+                        int x2= f1;
+                        arr.add(0,f1);
+                        f1= vis[f1];
+                        while(f1!=x2){
+                            arr.add(0,f1);
+                            // s.add(f1);
+                            f1=vis[f1];
+                        }
+                        arr.add(0,f1);
+                        break;
+                    }
+                }
+           }
+           if(f){
+            out.println(arr.size());
+                for(int i=0;i<arr.size();i++){
+            out.print(arr.get(i)+" ");
+           }
+           }else{
+            out.println("IMPOSSIBLE");
+           }
+           
+            // check(grid,n,m, i1,j1, i2, j2);
         
             
         
@@ -59,15 +97,66 @@ class MaxSubArraySumII {
             return;
         }
     }
+    static boolean  check(int i, int p, int [] vis, List<List<Integer>> adj){
+        
+        for(int x: adj.get(i)){
+            if(vis[x]==0 && x!=p){
+                vis[x]=i;
+                
+                if(check(x,i, vis,adj)){
+                        return true;
+                    }
+            }else if(vis[x]!=0 && x!=p){
+                vis[x]=i;
+                f1=x;
+                // out.println(x);
+                return true;
+            }
+        }
+        return false;    
+    }
+    static class DSU{
+        List<Integer> p,size ;
+        public DSU(int n){
+            p =new ArrayList<>();
+            size=new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                p.add(i);
+                size.add(1);
+            }
+        }
+        public int find(int n){
+            if(p.get(n)==n){
+                return n;
+            }
+            int v= find(p.get(n));
+            p.set(n,v);
+            return v;
+        }
+        public void union(int a, int b){
+            int p1 = find(a);
+            int p2 = find(b);
+            if(p1==p2){
+                return;
+            }
+            if(size.get(p1)>size.get(p2)){
+                p.set(p2, p1);
+                size.set(p1, size.get(p1)+size.get(p2));
+            }else{
+                p.set(p1, p2);
+                size.set(p2, size.get(p1)+size.get(p2));
+            }
+        }
+    }
+   
     static class Pair{
-        long v;
-        int idx;
-        public Pair(long v, int idx){
-            this.v=v;
-            this.idx=idx;
+        int r,c;
+        public Pair(int  r, int c){
+            this.r=r;
+            this.c=c;
         }
         public String toString(){
-            return v+" "+idx;
+            return r+" "+c;
         }
     }
     static long check(List<Long> arr, int L, int R){
@@ -549,3 +638,4 @@ class MaxSubArraySumII {
         }
     }
 }
+
