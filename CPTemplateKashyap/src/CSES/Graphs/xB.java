@@ -2,7 +2,7 @@ package CSES.Graphs;
 import java.io.*;
 import java.util.*;
  
-class Monsters {
+public class xB {
 
     static PrintWriter out;
     static Utility util;
@@ -15,6 +15,7 @@ class Monsters {
     static int[] dr = {-1,0,1,0}, dc= {0,1,0,-1};
     
     static TreeSet<String> res;
+    static int f1;
     public static void main(String[] args) {
         // Comment this code while running in Online Judge
         try {
@@ -36,29 +37,22 @@ class Monsters {
             Reader sc = new Reader();
             util = new Utility();
             out = new PrintWriter(System.out);
-            int n = sc.nextInt();
-            int m = sc.nextInt();
-            char[][] grid = new char[n][m];
-            String[] g =new String[n];
-            for(int i=0;i<n;i++){
-                g[i] =sc.readLine();
-            }
-            int i1=0, j1=0,i2=0,j2=0;
-            List<Pair> monsters = new ArrayList<>();
-            for(int i=0;i<n;i++){
-                String w= g[i];
-                for(int j=0;j<m;j++){
-                    grid[i][j]= w.charAt(j);
-                    if(grid[i][j]=='A'){
-                        i1=i;
-                        j1=j; 
-                    }else if(grid[i][j]=='M'){
-                        monsters.add(new Pair(i,j));
-                    }
+            int t = sc.nextInt();
+            while(t-->0){
+                int n = sc.nextInt();
+                
+            
+                // out.println(n +" "+m );
+                
+                long[] nums = new long[n];
+                for(int i=0;i<n;i++){
+                    nums[i]=sc.nextLong();
                 }
+                solve(n,nums);
             }
-            // out.println(i1 +" "+j1 +" "+ i2 +" "+j2);
-            check(grid,n,m, i1,j1, monsters);
+            
+           
+            // check(grid,n,m, i1,j1, i2, j2);
         
             
         
@@ -74,71 +68,96 @@ class Monsters {
             return;
         }
     }
-    static void  check(char[][] grid, int n, int m ,int i1, int j1,List<Pair> monsters ){
-        int[][]vis = new int[n][m];
-        PriorityQueue<Pair> q = new PriorityQueue<>((a,b)-> a.d==b.d? b.p-a.p:a.d-b.d);
-        q.add(new Pair(i1,j1,0,0));
-        for(Pair x: monsters){
-            q.add(new Pair(x.r,x.c,1,0));
-            vis[x.r][x.c]=1;
-        }
-        int[][]prev = new int[n][m];
-        String dir = "URDL";
-        vis[i1][j1]=1;
-        int f1=-1,f2=-1;
-        int f3=-1;
-        while(!q.isEmpty() && f3==-1){
-            Pair cur = q.poll();
-            for(int k=0;k<4;k++){
-                int x= cur.r+dr[k];
-                int y= cur.c+dc[k];
-                if((x<0  || y<0 || x>=n || y>=m) && (cur.p==0)){
-                    f1=cur.r;
-                    f2=cur.c;
-                    f3=2;
-                    break;
-                }
-                if(x>=0 && y>=0 && x<n && y<m && grid[x][y]!='#' && vis[x][y]==0){
-                    vis[x][y]=1;
-                    q.add(new Pair(x,y,cur.p,cur.d+1));
-                    prev[x][y]=k;
-                }
-                
-            }
-        }
-        if(f3==2){
-            System.out.println("YES");
-            // for(int[] x: prev)System.out.println(Arrays.toString(x));
-            StringBuilder sb = new StringBuilder();
-            Pair end= new Pair(f1,f2);
-            while(true){
-                if(end.r==i1 && end.c==j1) break;
-                int p = prev[end.r][end.c];
-                sb.append(dir.charAt(p));
-                
-                end= new Pair(end.r-dr[p],end.c-dc[p]);
-            }
-            // Collections.reverse(steps);
-            System.out.println(sb.length());
-            System.out.println(sb.reverse().toString());
-            System.out.println();
+    static void solve(int n , long[] nums){
+       List<Long> arr = new ArrayList<>();
+       arr.add(nums[0]);int j=1;
+
+       for(int i=1;i<n;i++){
+        if(arr.get(j-1)>nums[i]){
+            arr.add(nums[i]);
+            arr.add(nums[i]);
+            j=j+2;
         }else{
-             out.println("NO");
+            arr.add(nums[i]);
+            j++;
         }
-         
+       }
+       out.println(arr.size());
+       for(int i=0;i<arr.size();i++){
+        out.print(arr.get(i) +" ");
+       }
+       out.println("");
+    } 
+    static boolean  check(int n, int m, int i, char[][] grid, HashSet<Character> s, List<Character> arr ){
+        if(i==m){
+            // HashSet<Character> s1 = new HashSet<>(s);
+            int c=0;
+            String x= "vika";
+            // out.println(arr);
+            for(int j=0;j<arr.size();j++){
+                if(j<4 && arr.get(j)==x.charAt(j)){
+                    c++;
+                }
+            }
+            if(c==4){
+                
+                return true;
+            }return false;
+        }
+        if(check(n,m,i+1,grid,s,arr)){
+            return true;
+        }
+        for(int j=0;j<n;j++){
+            if(s.contains(grid[j][i]) && !arr.contains(grid[j][i])){
+                arr.add(grid[j][i]);
+                if(check(n,m,i+1,grid,s,arr)){
+                    return true;
+                }
+                arr.remove(arr.size()-1);
+            }
+        }
+        return false;
+            
+    }
+    static class DSU{
+        List<Integer> p,size ;
+        public DSU(int n){
+            p =new ArrayList<>();
+            size=new ArrayList<>();
+            for(int i=0;i<=n;i++){
+                p.add(i);
+                size.add(1);
+            }
+        }
+        public int find(int n){
+            if(p.get(n)==n){
+                return n;
+            }
+            int v= find(p.get(n));
+            p.set(n,v);
+            return v;
+        }
+        public void union(int a, int b){
+            int p1 = find(a);
+            int p2 = find(b);
+            if(p1==p2){
+                return;
+            }
+            if(size.get(p1)>size.get(p2)){
+                p.set(p2, p1);
+                size.set(p1, size.get(p1)+size.get(p2));
+            }else{
+                p.set(p1, p2);
+                size.set(p2, size.get(p1)+size.get(p2));
+            }
+        }
     }
    
     static class Pair{
-        int r,c,p,d;
-        public Pair(int  r, int c){
+        int r;long c;
+        public Pair(int  r, long c){
             this.r=r;
             this.c=c;
-        }
-        public Pair(int r, int c, int p, int d ){
-            this.r=r;
-            this.c=c;
-            this.p=p;
-          this.d=d;  
         }
         public String toString(){
             return r+" "+c;

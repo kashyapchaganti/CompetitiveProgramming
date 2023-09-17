@@ -1,8 +1,13 @@
-package CSES.Graphs;
+
+package Codeforces.Contests;
+
+
+//https://atcoder.jp/contests/dp/tasks/dp_i
 import java.io.*;
 import java.util.*;
+import java.util.function.LongPredicate;
  
-class Monsters {
+public class xA {
 
     static PrintWriter out;
     static Utility util;
@@ -10,21 +15,24 @@ class Monsters {
     static boolean ONLINE_JUDGE = false;
     static int itr;
     static int md = 32768;
+    static int mod = (int)(1e9+7);
 	static HashMap<Integer, List<GraphEdge>> graph;
+    static PriorityQueue<Pair> q1;
     
     static int[] dr = {-1,0,1,0}, dc= {0,1,0,-1};
     
     static TreeSet<String> res;
+    static int maxi;
     public static void main(String[] args) {
         // Comment this code while running in Online Judge
         try {
             // System.out.println(System.getProperty("ONLINE_JUDGE"));
             if (System.getProperty("ONLINE_JUDGE") == null && !ONLINE_JUDGE) {
-                FileOutputStream output = new FileOutputStream("CompetitiveProgramming/CPTemplateKashyap/src/CSES/SortingandSearching/output.txt");
+                FileOutputStream output = new FileOutputStream("/Users/kashyapchaganti/Documents/Code/CompetitiveProgramming/CPTemplateKashyap/src/Codeforces/Contests/output.txt");
                 PrintStream out = new PrintStream(output);
                 System.setOut(out);
  
-                InputStream input = new FileInputStream("CompetitiveProgramming/CPTemplateKashyap/src/CSES/SortingandSearching/input.txt");
+                InputStream input = new FileInputStream("/Users/kashyapchaganti/Documents/Code/CompetitiveProgramming/CPTemplateKashyap/src/Codeforces/Contests/input.txt");
                 System.setIn(input);
             }
  
@@ -36,32 +44,40 @@ class Monsters {
             Reader sc = new Reader();
             util = new Utility();
             out = new PrintWriter(System.out);
-            int n = sc.nextInt();
-            int m = sc.nextInt();
-            char[][] grid = new char[n][m];
-            String[] g =new String[n];
-            for(int i=0;i<n;i++){
-                g[i] =sc.readLine();
-            }
-            int i1=0, j1=0,i2=0,j2=0;
-            List<Pair> monsters = new ArrayList<>();
-            for(int i=0;i<n;i++){
-                String w= g[i];
-                for(int j=0;j<m;j++){
-                    grid[i][j]= w.charAt(j);
-                    if(grid[i][j]=='A'){
-                        i1=i;
-                        j1=j; 
-                    }else if(grid[i][j]=='M'){
-                        monsters.add(new Pair(i,j));
+            int t = sc.nextInt();
+            
+            while(t-->0){
+
+                int n= sc.nextInt();
+                int m= sc.nextInt();
+                out.println(n +" "+m );
+                char[][] grid = new char[n][m];
+                String[] arr = new String[n];
+                for(int i=0;i<n;i++){
+                    
+                        arr[i]=sc.readLine();
+                }
+                out.println(Arrays.toString(arr));
+                for(int i=0;i<n;i++){
+                    for(int j=0;j<m;j++){
+                        grid[i][j]= arr[i].charAt(j);
                     }
                 }
-            }
-            // out.println(i1 +" "+j1 +" "+ i2 +" "+j2);
-            check(grid,n,m, i1,j1, monsters);
-        
+                // out.println(n +" "+m );
+                
+                solve(n,m,grid);
             
-        
+            
+        }
+            
+
+            
+            
+            
+            
+            
+            
+            
             out.flush();
         
         }
@@ -74,134 +90,61 @@ class Monsters {
             return;
         }
     }
-    static void  check(char[][] grid, int n, int m ,int i1, int j1,List<Pair> monsters ){
-        int[][]vis = new int[n][m];
-        PriorityQueue<Pair> q = new PriorityQueue<>((a,b)-> a.d==b.d? b.p-a.p:a.d-b.d);
-        q.add(new Pair(i1,j1,0,0));
-        for(Pair x: monsters){
-            q.add(new Pair(x.r,x.c,1,0));
-            vis[x.r][x.c]=1;
-        }
-        int[][]prev = new int[n][m];
-        String dir = "URDL";
-        vis[i1][j1]=1;
-        int f1=-1,f2=-1;
-        int f3=-1;
-        while(!q.isEmpty() && f3==-1){
-            Pair cur = q.poll();
-            for(int k=0;k<4;k++){
-                int x= cur.r+dr[k];
-                int y= cur.c+dc[k];
-                if((x<0  || y<0 || x>=n || y>=m) && (cur.p==0)){
-                    f1=cur.r;
-                    f2=cur.c;
-                    f3=2;
-                    break;
+    static void solve(int n, int m ,char[][] grid){
+        HashSet<Character> s = new HashSet<>();
+        s.add('v');
+        s.add('i');
+        s.add('k');
+        s.add('a');
+        int c=0;
+        // for(char[] ch : grid){
+        //     System.out.println(Arrays.toString(ch));
+        // }
+        for(int j=0;j<m;j++){
+            for(int i=0;i<n;i++){
+                char ch = grid[i][j];
+                if(s.contains(ch)){
+                    c++;
+                    s.remove(ch);
                 }
-                if(x>=0 && y>=0 && x<n && y<m && grid[x][y]!='#' && vis[x][y]==0){
-                    vis[x][y]=1;
-                    q.add(new Pair(x,y,cur.p,cur.d+1));
-                    prev[x][y]=k;
-                }
-                
             }
         }
-        if(f3==2){
-            System.out.println("YES");
-            // for(int[] x: prev)System.out.println(Arrays.toString(x));
-            StringBuilder sb = new StringBuilder();
-            Pair end= new Pair(f1,f2);
-            while(true){
-                if(end.r==i1 && end.c==j1) break;
-                int p = prev[end.r][end.c];
-                sb.append(dir.charAt(p));
-                
-                end= new Pair(end.r-dr[p],end.c-dc[p]);
-            }
-            // Collections.reverse(steps);
-            System.out.println(sb.length());
-            System.out.println(sb.reverse().toString());
-            System.out.println();
-        }else{
-             out.println("NO");
-        }
-         
-    }
-   
-    static class Pair{
-        int r,c,p,d;
-        public Pair(int  r, int c){
-            this.r=r;
-            this.c=c;
-        }
-        public Pair(int r, int c, int p, int d ){
-            this.r=r;
-            this.c=c;
-            this.p=p;
-          this.d=d;  
-        }
-        public String toString(){
-            return r+" "+c;
-        }
-    }
-    static long check(List<Long> arr, int L, int R){
-        int n = arr.size();
-    long[] pre = new long[n + 1];
- 
-    // calculating prefix sum
-    // here pre[0] = 0
-    for (int i = 1; i <= n; i++) {
-        pre[i] = pre[i - 1]+arr.get(i - 1);
-    }   
-     
-      // treemap for storing prefix sums for
-      // subarray length L to R
-    TreeMap<Long, Long> s1 = new TreeMap<>();
- 
-    long ans = Long.MIN_VALUE;
- 
-    for (int i = L; i <= n; i++) {
-         
-        // if i > R, erase pre[i - R - 1]
-        // note that pre[0] = 0
-        if (i > R) {
-            // decrement count of pre[i - R - 1]
-            s1.put(pre[i - R - 1], s1.get(pre[i - R - 1])-1);
-            // if count is zero, element is not present
-            // in map so remove it
-            if (s1.get(pre[i - R - 1]) == 0)
-                s1.remove(pre[i - R - 1]);
-        }
- 
-        // insert pre[i - L]
-        s1.put(pre[i - L], s1.getOrDefault(pre[i - L], 0l)+1l);
- 
-        // find minimum value in treemap.
-        ans = Math.max(ans, pre[i] - s1.firstKey());
+        out.println(c==4?"YES" : "NO");
+        
+        
+        
+        
+       
         
     }
-    return ans;
-    }
- 
-
     
-    static boolean bs(long m, long[] arr){
-        int start =0; long s=0;
-        for(int i=0;i<arr.length;i++){
-            s+=arr[i];
-            if(s==m) return false;
-            while(s>m && start<i){
-                s-=arr[start];
-                if(s==m){
-                    return false;
-                }
-                start++;
-            }
-            if(start==i && arr[i]>m){
-                return true;
+    
+    
+    
+    
+    
+    static int bs(int r, int[] nums,int n){
+        int s= r+1,e=n-1;
+        int ans =e+1;
+        while(s<=e){
+            int m = s+(e-s)/2;
+            if(nums[m]>nums[r]){
+                ans =m;
+                e=m-1;
+            }else{
+                s=m+1; 
             }
         }
-        return true;
+        return ans;
+    }
+    static class Pair{
+        int r;
+        long c;
+        public Pair(int r, long c){
+            this.r=r;
+            this.c=c;
+        }
+
     }
     
 
@@ -623,4 +566,3 @@ class Monsters {
         }
     }
 }
-
